@@ -7,10 +7,29 @@ import org.json.JSONObject;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 public class Translator {
-    private final static String API_KEY = "trnsl.1.1.20170922T205950Z.e8fdcc1a5f095ef8." +
-            "4985b96369d828b60dd9ece94dba46da2ea61fd9";
+    private final static String API_KEY = getApiKey();
+
+    private static String getApiKey() {
+        Properties props = new Properties();
+        String key = null;
+
+        try {
+            FileInputStream fis = new FileInputStream("config.properties");
+            props.load(fis);
+
+            key = props.getProperty("api_key");
+            key = (key != null) ? key : "trnsl.1.1.20170922T205950Z.e8fdcc1a5f095ef8.4985b96369d828b60dd9ece94dba46da2ea61fd9";
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return key;
+    }
+
     private final static String UNIQUE_TRANSLATE_URL = "https://translate.yandex.net/api/v1.5/tr.json/translate?" +
             "key=" + API_KEY + "&lang=%s&text=%s";
     private final static String MULTIPLE_TRANSLATE_URL = "https://dictionary.yandex.net/dicservice.json/lookupMultiple?" +
@@ -65,6 +84,9 @@ public class Translator {
 
         String word = getResponse(urlUnuque);
         String words = getResponse(urlMultiple);
+
+        System.out.println(word);
+        System.out.println(words);
 
         return word;
     }

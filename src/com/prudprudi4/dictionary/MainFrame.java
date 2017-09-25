@@ -6,6 +6,7 @@ import javafx.scene.layout.Border;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,17 +17,23 @@ public class MainFrame extends BaseFrame {
     protected void init() {
         mainPanel.setLayout(new BorderLayout());
 
-        JList<String> jList = new JList<>(new String[]{"aaaaaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq", "aaaaa", "aaaaa", "aaaaa","sfsdf",
-                "sdfsdf", "sfsdf", "assfaf", "sfsdf", "sdfsdf", "sfsdf", "assfaf"});
-        JList<String> jList1 = new JList<>(new String[]{"aaaaa", "aaaaa", "aaaaa", "aaaaa","sfsdf",
-                "sdfsdf", "sfsdf", "assfaf", "sfsdf", "sdfsdf", "sfsdf", "assfaf"});
+        final DefaultListModel<String> model = new DefaultListModel<>();
+        JList<String> jList = new JList<>(model);
+        jList.setModel(model);
+        model.addElement("abcde");
+        model.addElement("fghij");
+        model.addElement("abcde");
+        model.addElement("fghij");
+        model.addElement("abcde");
+        model.addElement("fghij");
+        jList.setSelectedIndex(0);
 
-        JTextArea textArea = new JTextArea();
+        final JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
 
-        JPanel panel = new JPanel();
-        JScrollPane sPane1 = new JScrollPane(jList);
-        JScrollPane sPane2 = new JScrollPane(textArea);
+        final JPanel panel = new JPanel();
+        final JScrollPane sPane1 = new JScrollPane(jList);
+        final JScrollPane sPane2 = new JScrollPane(textArea);
         sPane1.setPreferredSize(new Dimension(215,420));
         sPane2.setPreferredSize(new Dimension(215,420));
         panel.setLayout(new FlowLayout());
@@ -34,17 +41,26 @@ public class MainFrame extends BaseFrame {
         panel.add(sPane2);
         mainPanel.add(panel, BorderLayout.NORTH);
 
-        JPanel buttonsPane = new JPanel();
+        final JPanel buttonsPane = new JPanel();
         buttonsPane.setLayout(new FlowLayout());
-        JButton addButton = new JButton("Добавить");
-        JButton delButton = new JButton("Удалить");
+
+        final JButton addButton = new JButton("Добавить");
+        final JButton delButton = new JButton("Удалить");
         buttonsPane.add(addButton);
         buttonsPane.add(delButton);
         mainPanel.add(buttonsPane, BorderLayout.SOUTH);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        addButton.addActionListener((e) -> new TranslatorFrame());
+        addButton.addActionListener((e) -> new TranslatorFrame(this));
+
+        jList.addListSelectionListener((e) -> {
+            if(e.getValueIsAdjusting()) {
+                int selectIndex = jList.getSelectedIndex();
+                jList.clearSelection();
+                jList.setSelectedIndex(0);
+            }
+        });
     }
 
     MainFrame() {

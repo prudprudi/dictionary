@@ -6,10 +6,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class BaseFrame extends JFrame {
-    protected String title;
-    protected int width;
-    protected int height;
-    protected JPanel mainPanel = new JPanel();
+    protected final String title;
+    protected final int width;
+    protected final int height;
+    protected final JPanel mainPanel = new JPanel();
 
     protected abstract void init();
 

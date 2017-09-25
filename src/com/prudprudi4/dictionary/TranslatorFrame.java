@@ -6,25 +6,36 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 public class TranslatorFrame extends BaseFrame {
-    private JTextField tField = new JTextField();
-    private JTextArea tArea = new JTextArea();
+    private final JTextArea fromArea = new JTextArea();
+    private final JTextArea toArea = new JTextArea();
+    private final JFrame parent;
+
+    private void setTextArea(JTextArea tArea, boolean isEditable) {
+        tArea.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        tArea.setLineWrap(true);
+        tArea.setWrapStyleWord(true);
+        tArea.setEditable(isEditable);
+    }
 
     protected void init() {
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
-        tArea.setLineWrap(true);
-        tArea.setEditable(false);
+        setTextArea(fromArea, true);
+        setTextArea(toArea, false);
 
-        JScrollPane sPane = new JScrollPane(tArea);
-        sPane.setPreferredSize(new Dimension(0, 238));
-        mainPanel.add(tField);
+        final JScrollPane fromPane = new JScrollPane(fromArea);
+        final JScrollPane toPane = new JScrollPane(toArea);
+        toPane.setPreferredSize(new Dimension(0,150));
+        mainPanel.add(fromPane);
         mainPanel.add(Box.createVerticalStrut(5));
-        mainPanel.add(sPane);
+        mainPanel.add(toPane);
 
-        tField.getDocument().addDocumentListener(new DocumentListener() {
+        fromArea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 textFieldListener(e);
@@ -40,25 +51,33 @@ public class TranslatorFrame extends BaseFrame {
 
             }
         });
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                parent.setEnabled(true);
+            }
+        });
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     }
 
     private void textFieldListener(DocumentEvent event) {
-        String text = tField.getText();
-
-        if (text.length() == 0) return;
+        String text = fromArea.getText();
+        String result;
 
         try {
-            String result = Translator.translate(text);
-            tArea.setText(result);
+            result = (text.length() == 0) ? "" : Translator.translate(text);
+
+            toArea.setText(result);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    TranslatorFrame() {
-        super("Translate", 300, 300);
+    TranslatorFrame(JFrame parent) {
+        super("Translate", 302, 300);
+        this.parent = parent;
+        parent.setEnabled(false);
         init();
         setVisible(true);
     }
