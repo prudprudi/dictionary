@@ -77,6 +77,7 @@ public class Translator {
     }
 
     public static String translate(String phrase) throws IOException {
+        phrase = phrase.trim();
         if (phrase.length() == 0) return "";
 
         String urlUnuque = prepareUrl(UNIQUE_TRANSLATE_URL, phrase);
