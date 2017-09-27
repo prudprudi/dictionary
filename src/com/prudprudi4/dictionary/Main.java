@@ -21,7 +21,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            Translator.translate("прыжок");
+            Translator.translate("структура");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
         } catch (Exception e) {

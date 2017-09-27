@@ -1,6 +1,7 @@
 package com.prudprudi4.dictionary.frame;
 
-import com.prudprudi4.dictionary.Translation;
+import com.prudprudi4.dictionary.SortedListModel;
+import com.prudprudi4.dictionary.WordEntity;
 import com.prudprudi4.dictionary.util.Disposition;
 
 import javax.swing.*;
@@ -13,17 +14,17 @@ public class MainFrame extends JFrame {
     private final static int WIDTH = 450;
     private final static int HEIGHT = 500;
 
-    private final Map<String, Translation> words = new HashMap<>();
-    private final DefaultListModel<String> listModel = new DefaultListModel<>();
+    private final Map<String, WordEntity> words = new HashMap<>();
+    private final SortedListModel<String> listModel = new SortedListModel<>();
 
     private final JList<String> listView = new JList<>(listModel);
     private final JPanel mainPanel = new JPanel();
 
-    public Map<String, Translation> getWords() {
+    public Map<String, WordEntity> getWords() {
         return words;
     }
 
-    public DefaultListModel<String> getListModel() {
+    public SortedListModel<String> getListModel() {
         return listModel;
     }
 

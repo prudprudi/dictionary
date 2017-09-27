@@ -1,8 +1,10 @@
 package com.prudprudi4.dictionary.util;
 
 import com.sun.istack.internal.Nullable;
-import jdk.nashorn.internal.ir.debug.JSONWriter;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.net.*;
@@ -76,19 +78,65 @@ public class Translator {
         return (result == null) ? "" : result.toString();
     }
 
-    public static String translate(String phrase) throws IOException {
-        phrase = phrase.trim();
-        if (phrase.length() == 0) return "";
+    public static JSONArray translate(String orig) throws IOException {
+        orig = orig.trim();
+        if (orig.length() == 0) return new JSONArray();
 
-        String urlUnuque = prepareUrl(UNIQUE_TRANSLATE_URL, phrase);
-        String urlMultiple = prepareUrl(MULTIPLE_TRANSLATE_URL, phrase);
+        String urlUnuque = prepareUrl(UNIQUE_TRANSLATE_URL, orig);
+        String urlMultiple = prepareUrl(MULTIPLE_TRANSLATE_URL, orig);
 
-        String word = getResponse(urlUnuque);
-        String words = getResponse(urlMultiple);
+        String translation = getResponse(urlUnuque);
+        String translationInfo = getResponse(urlMultiple);
 
-        System.out.println(word);
-        System.out.println(words);
+        System.out.println(translation);
+        System.out.println(translationInfo);
 
-        return word;
+        return getFinalJSON(orig, translation, translationInfo);
+    }
+
+    private static JSONArray getFinalJSON(String orig, String translation, String translationInfo) {
+        JSONParser parser = new JSONParser();
+        JSONArray result = new JSONArray();
+
+        try {
+            JSONObject obj = (JSONObject) parser.parse(translation);
+            JSONArray arr = (JSONArray) obj.get("text");
+            translation = (String)arr.get(0);
+            result.add(orig);
+            result.add(translation);
+
+            obj = (JSONObject) parser.parse(translationInfo);
+            String str = (obj.containsKey("ru-en")) ? "ru-en" : "en-ru";
+            obj = (JSONObject) obj.get(str);
+            arr = (JSONArray) obj.get("regular");
+
+            if (arr.isEmpty()) return result;
+
+            result.add(new JSONObject());
+            obj = (JSONObject) arr.get(0);
+            arr = (JSONArray) obj.get("tr");
+
+            JSONObject objInfo = (JSONObject) result.get(2);
+            JSONArray tArr;
+            String tooltip;
+            for (int i = 0; i < arr.size(); i++) {
+                obj = (JSONObject) arr.get(i);
+                str = (String) obj.get("text");
+                obj = (JSONObject) obj.get("pos");
+                tooltip = (String) obj.get("tooltip");
+
+                if (!objInfo.containsKey(tooltip)) {
+                    objInfo.put(tooltip, new JSONArray());
+                }
+
+                tArr = (JSONArray) objInfo.get(tooltip);
+                tArr.add(str);
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }

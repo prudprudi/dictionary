@@ -1,5 +1,6 @@
 package com.prudprudi4.dictionary.frame;
 
+import com.prudprudi4.dictionary.SortedListModel;
 import com.prudprudi4.dictionary.util.Translator;
 
 import javax.swing.*;
@@ -9,6 +10,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TranslatorFrame extends JDialog {
     private final static String TITLE = "Translate";
@@ -76,22 +79,23 @@ public class TranslatorFrame extends JDialog {
 
             @Override
             public void keyPressed(KeyEvent e) {
+                String fromText = fromArea.getText().trim();
+                if (fromText.length() == 0) {
+                    toArea.setText("");
+                    return;
+                }
 
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     dispose();
+                    parent.getListView().requestFocus();
 
                     String text = fromArea.getText();
-                    DefaultListModel<String> listModel = parent.getListModel();
-                    String t = listModel.get(0);
-                    listModel.set(0, listModel.get(4));
-                    listModel.set(4, t);
-//                    JList<String> listView = parent.getListView();
-//                    if (!listModel.contains(text)) {
-//                        listModel.addElement(text);
-//                    }
-//                    listView.requestFocus();
-//                    listView.setSelectedIndex(listModel.size() - 1);
+                    SortedListModel<String> listModel = parent.getListModel();
 
+                    boolean isAdded = listModel.addElement(text);
+
+                    int index = listModel.getIndexByElement(text);
+                    parent.getListView().setSelectedIndex(index);
                 }
             }
 
@@ -105,13 +109,7 @@ public class TranslatorFrame extends JDialog {
     private void textFieldListener(DocumentEvent event) {
         new Thread(() -> {
             try {
-                String text = fromArea.getText().trim();
-                if (text.length() == 0) {
-                    fromArea.setText("");
-                    toArea.setText("");
-                    return;
-                }
-
+                String text = fromArea.getText();
                 toArea.setText(Translator.translate(text));
 
             } catch (IOException e) {

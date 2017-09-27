@@ -2,8 +2,11 @@ package com.prudprudi4.dictionary;
 
 import com.prudprudi4.dictionary.frame.MainFrame;
 
+import javax.swing.*;
+
 public class Dictionary {
     Dictionary() {
-        new MainFrame().setVisible(true);
+        JFrame frame = new MainFrame();
+        frame.setVisible(true);
     }
 }
