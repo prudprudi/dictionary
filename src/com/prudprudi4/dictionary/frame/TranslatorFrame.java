@@ -110,7 +110,7 @@ public class TranslatorFrame extends JDialog {
         new Thread(() -> {
             try {
                 String text = fromArea.getText();
-                toArea.setText(Translator.translate(text));
+                toArea.setText(Translator.translate(text).toString());
 
             } catch (IOException e) {
                 e.printStackTrace();
