@@ -1,28 +1,34 @@
 package com.prudprudi4.dictionary;
 
 import com.prudprudi4.dictionary.util.Translator;
-import com.sun.java.swing.plaf.motif.MotifLookAndFeel;
-import jdk.internal.org.objectweb.asm.tree.InnerClassNode;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Properties;
+import java.sql.SQLException;
+import java.util.Enumeration;
 
 public class Main {
+
+    public static void setUIFont (FontUIResource f){
+        Enumeration keys = UIManager.getLookAndFeelDefaults().keys();
+        while (keys.hasMoreElements()) {
+        Object key = keys.nextElement();
+        Object value = UIManager.get (key);
+        if (value != null && value instanceof FontUIResource) {
+            UIManager.put(key, f);
+            System.out.println(value);
+        }
+    }
+}
 
     public static void main(String[] args) {
         try {
             Translator.translate("структура");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            setUIFont(new FontUIResource(new Font("Segoe UI", Font.PLAIN, 12)));
 
         } catch (Exception e) {
             e.printStackTrace();

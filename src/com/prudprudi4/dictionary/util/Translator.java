@@ -78,9 +78,9 @@ public class Translator {
         return (result == null) ? "" : result.toString();
     }
 
-    public static JSONArray translate(String orig) throws IOException {
+    public static JSONObject translate(String orig) throws IOException {
         orig = orig.trim();
-        if (orig.length() == 0) return new JSONArray();
+        if (orig.length() == 0) return new JSONObject();
 
         String urlUnuque = prepareUrl(UNIQUE_TRANSLATE_URL, orig);
         String urlMultiple = prepareUrl(MULTIPLE_TRANSLATE_URL, orig);
@@ -95,15 +95,17 @@ public class Translator {
         return getFinalJSON(translation, translationInfo);
     }
 
-    private static JSONArray getFinalJSON(String translation, String translationInfo) {
+    private static JSONObject getFinalJSON(String translation, String translationInfo) {
         JSONParser parser = new JSONParser();
-        JSONArray result = new JSONArray();
+        JSONArray array = new JSONArray();
+        JSONObject result = new JSONObject();
+        result.put("result", array);
 
         try {
             JSONObject obj = (JSONObject) parser.parse(translation);
             JSONArray arr = (JSONArray) obj.get("text");
             translation = (String) arr.get(0);
-            result.add(translation);
+            array.add(translation);
 
             obj = (JSONObject) parser.parse(translationInfo);
             String str = (obj.containsKey("ru-en")) ? "ru-en" : "en-ru";
@@ -112,11 +114,11 @@ public class Translator {
 
             if (arr.isEmpty()) return result;
 
-            result.add(new JSONObject());
+            array.add(new JSONObject());
             obj = (JSONObject) arr.get(0);
             arr = (JSONArray) obj.get("tr");
 
-            JSONObject objInfo = (JSONObject) result.get(1);
+            JSONObject objInfo = (JSONObject) array.get(1);
             JSONArray tArr;
             String tooltip;
             for (int i = 0; i < arr.size(); i++) {

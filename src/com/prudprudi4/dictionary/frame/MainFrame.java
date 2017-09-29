@@ -4,16 +4,19 @@ import com.prudprudi4.dictionary.Dictionary;
 import com.prudprudi4.dictionary.DocumentSizeFilter;
 import com.prudprudi4.dictionary.SortedListModel;
 import com.prudprudi4.dictionary.WordEntity;
-import com.prudprudi4.dictionary.util.Disposition;
+import com.prudprudi4.dictionary.util.TextFormatter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultStyledDocument;
-import javax.swing.text.Document;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +30,7 @@ public class MainFrame extends JFrame {
 
     private final JList<String> listView = new JList<>(listModel);
     private final JTextField searchField = new JTextField();
+    private final JEditorPane editorPane = new JEditorPane();
     private final JPanel mainPanel = new JPanel();
 
     public Map<String, WordEntity> getWords() {
@@ -43,29 +47,68 @@ public class MainFrame extends JFrame {
         return mainPanel;
     }
 
+    private void loadWords() {
+        File file = new File("words");
+        BufferedReader br = null;
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            br = new BufferedReader(new FileReader(file));
+
+            JSONParser parser = new JSONParser();
+            JSONObject obj;
+            JSONArray arr;
+            String line;
+            String[] strs;
+            WordEntity wEntity;
+
+            while((line = br.readLine()) != null) {
+                strs = line.split("=", 2);
+                listModel.addElement(strs[0]);
+                obj = (JSONObject) parser.parse(strs[1]);
+                arr = (JSONArray) obj.get("result");
+                wEntity = new WordEntity(arr);
+                words.put(strs[0], wEntity);
+            }
+
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        }
+    }
+
     private void init() {
         setTitle(TITLE);
         setSize(WIDTH, HEIGHT);
         setResizable(false);
         getContentPane().add(mainPanel);
-        setLocation(Disposition.getWindowCenterPos(WIDTH, HEIGHT));
+
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        Point p = new Point(d.width / 2 - WIDTH / 2, d.height / 2 - HEIGHT / 2);
+
+        setLocation(p);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         mainPanel.setLayout(new BorderLayout());
-
-        listModel.addElement("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        listModel.addElement("ffff");
-        listModel.addElement("bbbb");
-        listModel.addElement("cccc");
-        listModel.addElement("dddd");
-        listModel.addElement("eeee");
         listView.setSelectedIndex(0);
 
         final JPanel containerPanel = new JPanel();
         final JScrollPane listPane = new JScrollPane(listView);
-        final JEditorPane editorPane = new JEditorPane();
         final JScrollPane editorScrollPane = new JScrollPane(editorPane);
+        editorPane.setContentType("text/html");
         editorPane.setEditable(false);
+        editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 
         listPane.setPreferredSize(new Dimension(214,420));
         editorPane.setPreferredSize(new Dimension(214,420));
@@ -115,12 +158,28 @@ public class MainFrame extends JFrame {
             JDialog dialog = new TranslatorFrame(this);
             dialog.setVisible(true);
         });
+
+        listView.addKeyListener(new KeyAdapter() {
+
+        });
+
         listView.addListSelectionListener((e) -> {
             if(e.getValueIsAdjusting()) {
-                int selectedIndex = listView.getSelectedIndex();
-                listView.setSelectionInterval(selectedIndex, selectedIndex);
+                showWordInfo();
             }
         });
+    }
+
+    private void showWordInfo() {
+        int index = listView.getSelectedIndex();
+
+        if (index == -1) return;
+        listView.setSelectionInterval(index, index);
+
+        String text = listModel.getElementAt(index);
+        WordEntity wEntity = words.get(text);
+        text = TextFormatter.format(wEntity);
+        editorPane.setText(text);
     }
 
     private void searchFieldHandler(DocumentEvent e) {
@@ -134,5 +193,6 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         init();
+        loadWords();
     }
 }
