@@ -9,20 +9,27 @@ import java.util.Map;
 
 public class WordEntity {
     private String translation;
+    private JSONObject json;
     private Map<String, ArrayList<String>> translationInfo = new HashMap<>();
 
     public String getTranslation() {
         return translation;
     }
 
+    public JSONObject getJson() {
+        return json;
+    }
+
     public Map<String, ArrayList<String>> getTranslationInfo() {
         return translationInfo;
     }
 
-    public WordEntity(JSONArray jsonArr){
+    public WordEntity(JSONObject jsobObj){
+        json = jsobObj;
+        JSONArray jsonArr = (JSONArray) jsobObj.get("result");
         translation = (String) jsonArr.get(0);
 
-        if (jsonArr.size() == 1) { return; }
+        if (jsonArr.size() == 1) return;
 
         JSONObject obj = (JSONObject) jsonArr.get(1);
         JSONArray arr;

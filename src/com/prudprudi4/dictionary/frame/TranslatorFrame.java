@@ -17,12 +17,12 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
-public class TranslatorFrame extends JDialog {
+class TranslatorFrame extends JDialog {
     private final static String TITLE = "Translate";
     private final static int WIDTH = 302;
     private final static int HEIGHT = 300;
@@ -34,8 +34,27 @@ public class TranslatorFrame extends JDialog {
 
     private WordEntity wEntity;
 
-    private void saveWord() {
+    private void saveWord(String word, JSONObject obj) {
+        String string = word + "=" + obj.toString();
+        File file = new File(Dictionary.filePath);
+        PrintWriter pw = null;
 
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            pw = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+            pw.println(string);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        } finally {
+            if (pw != null) {
+                pw.close();
+            }
+        }
     }
 
     private void init() {
@@ -45,6 +64,7 @@ public class TranslatorFrame extends JDialog {
         setResizable(false);
         setLocationRelativeTo(parent);
         getContentPane().add(mainPanel);
+
         editorPane.setContentType("text/html");
         editorPane.setEditable(false);
         editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
@@ -61,13 +81,21 @@ public class TranslatorFrame extends JDialog {
         fromField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (fromField.getText().trim().isEmpty()) {
+                String text = fromField.getText().trim();
+                if (text.isEmpty()) {
                     editorPane.setText("");
-                } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    dispose();
-                    parent.getListView().requestFocus();
+                    return;
+                }
 
-                    String text = fromField.getText().trim();
+                if (text.indexOf('=') != -1) {
+                    return;
+                }
+
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    dispose();
+                    JList<String> listView = parent.getListView();
+                    listView.requestFocus();
+
                     SortedListModel listModel = parent.getListModel();
 
                     boolean isAdded = listModel.addElement(text);
@@ -75,10 +103,12 @@ public class TranslatorFrame extends JDialog {
 
                     if (isAdded) {
                         words.put(text, wEntity);
+                        saveWord(text, wEntity.getJson());
                     }
 
                     int index = listModel.getIndexByElement(text);
-                    parent.getListView().setSelectedIndex(index);
+                    listView.setSelectedIndex(index);
+                    parent.showWordInfo();
 
                     wEntity = null;
                 }
@@ -103,6 +133,7 @@ public class TranslatorFrame extends JDialog {
 
             }
         });
+
         fromField.setDocument(doc);
     }
 
@@ -112,12 +143,12 @@ public class TranslatorFrame extends JDialog {
             try {
                 String text = fromField.getText();
                 JSONObject obj = Translator.translate(text);
-                JSONArray arr = (JSONArray) obj.get("result");
-                if (arr == null || arr.isEmpty()) {
+
+                if (obj.isEmpty()) {
                     editorPane.setText("");
                     return;
                 }
-                wEntity = new WordEntity(arr);
+                wEntity = new WordEntity(obj);
                 String format = TextFormatter.format(wEntity);
                 editorPane.setText(format);
 

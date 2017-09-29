@@ -88,10 +88,6 @@ public class Translator {
         String translation = getResponse(urlUnuque);
         String translationInfo = getResponse(urlMultiple);
 
-        System.out.println(translation);
-        System.out.println(translationInfo);
-
-        System.out.println(getFinalJSON(translation, translationInfo).toString());
         return getFinalJSON(translation, translationInfo);
     }
 

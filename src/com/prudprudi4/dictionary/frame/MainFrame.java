@@ -48,7 +48,7 @@ public class MainFrame extends JFrame {
     }
 
     private void loadWords() {
-        File file = new File("words");
+        File file = new File(Dictionary.filePath);
         BufferedReader br = null;
         try {
             if (!file.exists()) {
@@ -68,8 +68,7 @@ public class MainFrame extends JFrame {
                 strs = line.split("=", 2);
                 listModel.addElement(strs[0]);
                 obj = (JSONObject) parser.parse(strs[1]);
-                arr = (JSONArray) obj.get("result");
-                wEntity = new WordEntity(arr);
+                wEntity = new WordEntity(obj);
                 words.put(strs[0], wEntity);
             }
 
@@ -80,6 +79,7 @@ public class MainFrame extends JFrame {
             if (br != null) {
                 try {
                     br.close();
+
                 } catch (IOException e) {
                     e.printStackTrace();
 
@@ -101,7 +101,6 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         mainPanel.setLayout(new BorderLayout());
-        listView.setSelectedIndex(0);
 
         final JPanel containerPanel = new JPanel();
         final JScrollPane listPane = new JScrollPane(listView);
@@ -159,18 +158,13 @@ public class MainFrame extends JFrame {
             dialog.setVisible(true);
         });
 
-        listView.addKeyListener(new KeyAdapter() {
-
-        });
-
         listView.addListSelectionListener((e) -> {
-            if(e.getValueIsAdjusting()) {
-                showWordInfo();
-            }
+            showWordInfo();
         });
+
     }
 
-    private void showWordInfo() {
+    protected void showWordInfo() {
         int index = listView.getSelectedIndex();
 
         if (index == -1) return;
@@ -194,5 +188,6 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         init();
         loadWords();
+        listView.setSelectedIndex(0);
     }
 }
