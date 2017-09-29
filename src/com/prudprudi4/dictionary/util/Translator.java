@@ -91,18 +91,18 @@ public class Translator {
         System.out.println(translation);
         System.out.println(translationInfo);
 
-        return getFinalJSON(orig, translation, translationInfo);
+        System.out.println(getFinalJSON(translation, translationInfo).toString());
+        return getFinalJSON(translation, translationInfo);
     }
 
-    private static JSONArray getFinalJSON(String orig, String translation, String translationInfo) {
+    private static JSONArray getFinalJSON(String translation, String translationInfo) {
         JSONParser parser = new JSONParser();
         JSONArray result = new JSONArray();
 
         try {
             JSONObject obj = (JSONObject) parser.parse(translation);
             JSONArray arr = (JSONArray) obj.get("text");
-            translation = (String)arr.get(0);
-            result.add(orig);
+            translation = (String) arr.get(0);
             result.add(translation);
 
             obj = (JSONObject) parser.parse(translationInfo);
@@ -116,7 +116,7 @@ public class Translator {
             obj = (JSONObject) arr.get(0);
             arr = (JSONArray) obj.get("tr");
 
-            JSONObject objInfo = (JSONObject) result.get(2);
+            JSONObject objInfo = (JSONObject) result.get(1);
             JSONArray tArr;
             String tooltip;
             for (int i = 0; i < arr.size(); i++) {

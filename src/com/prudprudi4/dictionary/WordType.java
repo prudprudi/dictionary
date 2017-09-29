@@ -5,7 +5,8 @@ public enum WordType {
     ADJECTIVE("прилагательное"),
     VERB("глагол"),
     ADVERB("наречие"),
-    PRONOUN("местоимение");
+    PRONOUN("местоимение"),
+    PARTICLE("частица");
 
     private String type;
 

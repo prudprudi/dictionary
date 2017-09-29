@@ -1,26 +1,27 @@
 package com.prudprudi4.dictionary;
 
 import javax.swing.*;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class SortedListModel<T> extends AbstractListModel<T> implements Iterable<T> {
-    private SortedSet<T> set = new TreeSet<>();
+public class SortedListModel extends AbstractListModel<String> implements Iterable<String> {
+    private SortedSet<String> set = new TreeSet<>();
 
     public int getSize() {
         return set.size();
     }
 
-    public boolean addElement(T t) {
-        boolean isAdd = set.add(t);
+    public boolean addElement(String string) {
+        boolean isAdd = set.add(string);
         if(isAdd) {
             fireContentsChanged(this, 0, getSize());
         }
         return isAdd;
     }
 
-    public Iterator<T> iterator() {
+    public Iterator<String> iterator() {
         return set.iterator();
     }
 
@@ -29,19 +30,30 @@ public class SortedListModel<T> extends AbstractListModel<T> implements Iterable
         fireContentsChanged(this, 0, getSize());
     }
 
-    public boolean removeElementAt(T t) {
-        boolean isRemove = set.remove(t);
+    public boolean removeElementAt(String string) {
+        boolean isRemove = set.remove(string);
         if(isRemove) {
             fireContentsChanged(this, 0, getSize());
         }
         return isRemove;
     }
 
-    public T getElementAt(int index) {
-        return (T)set.toArray()[index];
+    public int getIndexBySubstring(String string) {
+        Iterator<String> it = set.iterator();
+        while(it.hasNext()) {
+            String s = it.next();
+            if (s.startsWith(string)) {
+                return getIndexByElement(s);
+            }
+        }
+        return -1;
     }
 
-    public int getIndexByElement(T t) {
-        return (set.contains(t)) ? set.headSet(t).size() : -1;
+    public String getElementAt(int index) {
+        return (String)set.toArray()[index];
+    }
+
+    public int getIndexByElement(String string) {
+        return (set.contains(string)) ? set.headSet(string).size() : -1;
     }
 }
