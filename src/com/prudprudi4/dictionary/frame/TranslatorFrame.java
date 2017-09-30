@@ -35,26 +35,7 @@ class TranslatorFrame extends JDialog {
     private WordEntity wEntity;
 
     private void saveWord(String word, JSONObject obj) {
-        String string = word + "=" + obj.toString();
-        File file = new File(Dictionary.filePath);
-        PrintWriter pw = null;
 
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            pw = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-            pw.println(string);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        } finally {
-            if (pw != null) {
-                pw.close();
-            }
-        }
     }
 
     private void init() {

@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class Dictionary {
     public final static int MAX_SYMBOLS = 35;
-    public final static String filePath = "words.txt";
+    public final static String WORDS_STORAGE_PATH = "words.txt";
 
     Dictionary() {
         JFrame frame = new MainFrame();

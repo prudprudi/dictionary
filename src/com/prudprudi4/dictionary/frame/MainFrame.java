@@ -5,6 +5,7 @@ import com.prudprudi4.dictionary.DocumentSizeFilter;
 import com.prudprudi4.dictionary.SortedListModel;
 import com.prudprudi4.dictionary.WordEntity;
 import com.prudprudi4.dictionary.util.TextFormatter;
+import com.prudprudi4.dictionary.util.WordStorage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -33,11 +34,11 @@ public class MainFrame extends JFrame {
     private final JEditorPane editorPane = new JEditorPane();
     private final JPanel mainPanel = new JPanel();
 
-    public Map<String, WordEntity> getWords() {
-        return words;
-    }
     public SortedListModel getListModel() {
         return listModel;
+    }
+    public Map<String, WordEntity> getWords() {
+        return words;
     }
 
     public JList<String> getListView() {
@@ -45,47 +46,6 @@ public class MainFrame extends JFrame {
     }
     public JPanel getMainPanel() {
         return mainPanel;
-    }
-
-    private void loadWords() {
-        File file = new File(Dictionary.filePath);
-        BufferedReader br = null;
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            br = new BufferedReader(new FileReader(file));
-
-            JSONParser parser = new JSONParser();
-            JSONObject obj;
-            JSONArray arr;
-            String line;
-            String[] strs;
-            WordEntity wEntity;
-
-            while((line = br.readLine()) != null) {
-                strs = line.split("=", 2);
-                listModel.addElement(strs[0]);
-                obj = (JSONObject) parser.parse(strs[1]);
-                wEntity = new WordEntity(obj);
-                words.put(strs[0], wEntity);
-            }
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-
-                }
-            }
-        }
     }
 
     private void init() {
@@ -157,21 +117,45 @@ public class MainFrame extends JFrame {
             JDialog dialog = new TranslatorFrame(this);
             dialog.setVisible(true);
         });
+        delButton.addActionListener((e) -> {
+            if (listModel.getSize() == 0) return;
 
-        listView.addListSelectionListener((e) -> {
-            showWordInfo();
+            int index = listView.getSelectedIndex();
+            listModel.removeElementAtIndex(index);
+            listView.setSelectedIndex(index);
+
+            if (index == 0 && listModel.getSize() != 0) {
+                listView.setSelectedIndex(0);
+                showWordInfo();
+            } else if(index > 0) {
+                listView.setSelectedIndex(--index);
+                showWordInfo();
+            } else {
+                editorPane.setText("");
+            }
+        });
+
+        listView.addListSelectionListener((e) -> showWordInfo());
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                WordStorage.save(listModel, words);
+            }
         });
 
     }
 
-    protected void showWordInfo() {
+     void showWordInfo() {
         int index = listView.getSelectedIndex();
+        String text;
+        WordEntity wEntity;
 
         if (index == -1) return;
         listView.setSelectionInterval(index, index);
 
-        String text = listModel.getElementAt(index);
-        WordEntity wEntity = words.get(text);
+        text = listModel.getElementAt(index);
+        wEntity = words.get(text);
         text = TextFormatter.format(wEntity);
         editorPane.setText(text);
     }
@@ -187,7 +171,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
         init();
-        loadWords();
+        WordStorage.load(listModel, words);
         listView.setSelectedIndex(0);
     }
 }

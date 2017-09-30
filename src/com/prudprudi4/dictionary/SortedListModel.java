@@ -38,6 +38,11 @@ public class SortedListModel extends AbstractListModel<String> implements Iterab
         return isRemove;
     }
 
+    public boolean removeElementAtIndex(int index) {
+        String string = getElementAt(index);
+        return removeElementAt(string);
+    }
+
     public int getIndexBySubstring(String string) {
         Iterator<String> it = set.iterator();
         while(it.hasNext()) {
