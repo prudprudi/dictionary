@@ -8,12 +8,11 @@ import java.awt.*;
 import java.util.Enumeration;
 
 public class Main {
-
     private static void setUIFont (FontUIResource f){
         Enumeration keys = UIManager.getLookAndFeelDefaults().keys();
         while (keys.hasMoreElements()) {
-        Object key = keys.nextElement();
-        Object value = UIManager.get (key);
+            Object key = keys.nextElement();
+            Object value = UIManager.get (key);
         if (value != null && value instanceof FontUIResource) {
             UIManager.put(key, f);
         }
@@ -22,9 +21,9 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            Translator.translate("структура");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             setUIFont(new FontUIResource(new Font("Segoe UI", Font.PLAIN, 12)));
+            Translator.translate("first");
 
         } catch (Exception e) {
             e.printStackTrace();

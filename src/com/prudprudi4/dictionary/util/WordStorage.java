@@ -7,11 +7,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import javax.swing.*;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.SortedSet;
 
 public class WordStorage {
     public static void load(SortedListModel model, Map<String, WordEntity> words) {
@@ -53,7 +50,6 @@ public class WordStorage {
             }
         }
     }
-
     public static void save(SortedListModel model, Map<String, WordEntity> words) {
         File file = new File(Dictionary.WORDS_STORAGE_PATH);
         PrintWriter pw = null;

@@ -8,13 +8,13 @@ public enum WordType {
     PRONOUN("местоимение"),
     PARTICLE("частица");
 
-    private String type;
-
-    private WordType(String type) {
-        this.type = type;
-    }
+    private final String type;
 
     String getType() {
         return type;
+    }
+
+    WordType(String type) {
+        this.type = type;
     }
 }

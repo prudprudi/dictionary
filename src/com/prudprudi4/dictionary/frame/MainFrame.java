@@ -6,10 +6,6 @@ import com.prudprudi4.dictionary.SortedListModel;
 import com.prudprudi4.dictionary.WordEntity;
 import com.prudprudi4.dictionary.util.TextFormatter;
 import com.prudprudi4.dictionary.util.WordStorage;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -17,7 +13,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultStyledDocument;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,20 +29,36 @@ public class MainFrame extends JFrame {
     private final JEditorPane editorPane = new JEditorPane();
     private final JPanel mainPanel = new JPanel();
 
-    public SortedListModel getListModel() {
+    SortedListModel getListModel() {
         return listModel;
     }
-    public Map<String, WordEntity> getWords() {
+    Map<String, WordEntity> getWords() {
         return words;
     }
-
-    public JList<String> getListView() {
+    JList<String> getListView() {
         return listView;
     }
-    public JPanel getMainPanel() {
-        return mainPanel;
-    }
+    private void searchFieldHandler(DocumentEvent e) {
+        String text = searchField.getText();
+        int index = listModel.getIndexBySubstring(text);
 
+        if(index != -1) {
+            listView.setSelectedIndex(index);
+        }
+    }
+    void showWordInfo() {
+        int index = listView.getSelectedIndex();
+        String text;
+        WordEntity wEntity;
+
+        if (index == -1) return;
+        listView.setSelectionInterval(index, index);
+
+        text = listModel.getElementAt(index);
+        wEntity = words.get(text);
+        text = TextFormatter.format(wEntity);
+        editorPane.setText(text);
+    }
     private void init() {
         setTitle(TITLE);
         setSize(WIDTH, HEIGHT);
@@ -144,29 +155,6 @@ public class MainFrame extends JFrame {
             }
         });
 
-    }
-
-     void showWordInfo() {
-        int index = listView.getSelectedIndex();
-        String text;
-        WordEntity wEntity;
-
-        if (index == -1) return;
-        listView.setSelectionInterval(index, index);
-
-        text = listModel.getElementAt(index);
-        wEntity = words.get(text);
-        text = TextFormatter.format(wEntity);
-        editorPane.setText(text);
-    }
-
-    private void searchFieldHandler(DocumentEvent e) {
-        String text = searchField.getText();
-        int index = listModel.getIndexBySubstring(text);
-
-        if(index != -1) {
-            listView.setSelectedIndex(index);
-        }
     }
 
     public MainFrame() {

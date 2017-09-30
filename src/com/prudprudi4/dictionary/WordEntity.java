@@ -8,18 +8,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WordEntity {
-    private String translation;
-    private JSONObject json;
-    private Map<String, ArrayList<String>> translationInfo = new HashMap<>();
+    private final String translation;
+    private final JSONObject json;
+    private final Map<String, ArrayList<String>> translationInfo = new HashMap<>();
 
     public String getTranslation() {
         return translation;
     }
-
     public JSONObject getJson() {
         return json;
     }
-
     public Map<String, ArrayList<String>> getTranslationInfo() {
         return translationInfo;
     }

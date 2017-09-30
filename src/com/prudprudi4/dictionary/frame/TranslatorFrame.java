@@ -6,7 +6,6 @@ import com.prudprudi4.dictionary.SortedListModel;
 import com.prudprudi4.dictionary.WordEntity;
 import com.prudprudi4.dictionary.util.TextFormatter;
 import com.prudprudi4.dictionary.util.Translator;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import javax.swing.*;
@@ -16,10 +15,7 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 
 class TranslatorFrame extends JDialog {
@@ -33,10 +29,7 @@ class TranslatorFrame extends JDialog {
     private final MainFrame parent;
 
     private WordEntity wEntity;
-
-    private void saveWord(String word, JSONObject obj) {
-
-    }
+    private Thread thread;
 
     private void init() {
         setTitle(TITLE);
@@ -62,7 +55,8 @@ class TranslatorFrame extends JDialog {
         fromField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                String text = fromField.getText().trim();
+
+                String text = fromField.getText().trim().intern();
                 if (text.isEmpty()) {
                     editorPane.setText("");
                     return;
@@ -72,26 +66,30 @@ class TranslatorFrame extends JDialog {
                     return;
                 }
 
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    dispose();
-                    JList<String> listView = parent.getListView();
-                    listView.requestFocus();
+                try {
+                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                        thread.join();
+                        dispose();
+                        JList<String> listView = parent.getListView();
+                        listView.requestFocus();
 
-                    SortedListModel listModel = parent.getListModel();
+                        SortedListModel listModel = parent.getListModel();
 
-                    boolean isAdded = listModel.addElement(text);
-                    Map<String, WordEntity> words = parent.getWords();
+                        boolean isAdded = listModel.addElement(text);
+                        Map<String, WordEntity> words = parent.getWords();
 
-                    if (isAdded) {
-                        words.put(text, wEntity);
-                        saveWord(text, wEntity.getJson());
+                        if (isAdded) {
+                            words.put(text, wEntity);
+                        }
+
+                        int index = listModel.getIndexByElement(text);
+                        listView.setSelectedIndex(index);
+                        parent.showWordInfo();
+
+                        wEntity = null;
                     }
-
-                    int index = listModel.getIndexByElement(text);
-                    listView.setSelectedIndex(index);
-                    parent.showWordInfo();
-
-                    wEntity = null;
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
                 }
             }
         });
@@ -114,13 +112,16 @@ class TranslatorFrame extends JDialog {
 
             }
         });
-
         fromField.setDocument(doc);
     }
-
-
     private void fromFieldHandler(DocumentEvent event) {
-        new Thread(() -> {
+        thread = new Thread(new PrintWordInfoRunnable());
+        thread.start();
+    }
+
+    private class PrintWordInfoRunnable implements Runnable {
+        @Override
+        public void run() {
             try {
                 String text = fromField.getText();
                 JSONObject obj = Translator.translate(text);
@@ -136,7 +137,7 @@ class TranslatorFrame extends JDialog {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }).start();
+        }
     }
 
     TranslatorFrame(MainFrame parent) {
