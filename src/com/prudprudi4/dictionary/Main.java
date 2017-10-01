@@ -1,10 +1,12 @@
 package com.prudprudi4.dictionary;
 
+import com.prudprudi4.dictionary.frame.ErrorDialog;
 import com.prudprudi4.dictionary.util.Translator;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
+import java.io.IOException;
 import java.util.Enumeration;
 
 public class Main {
@@ -25,9 +27,9 @@ public class Main {
             setUIFont(new FontUIResource(new Font("Segoe UI", Font.PLAIN, 12)));
             Translator.translate("first");
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {
+            new ErrorDialog("Connection problem: " + e.toString());
+        } catch (Exception e) {}
 
         EventQueue.invokeLater(() -> new Dictionary());
     }

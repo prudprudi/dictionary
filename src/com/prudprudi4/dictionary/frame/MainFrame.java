@@ -4,6 +4,7 @@ import com.prudprudi4.dictionary.Dictionary;
 import com.prudprudi4.dictionary.DocumentSizeFilter;
 import com.prudprudi4.dictionary.SortedListModel;
 import com.prudprudi4.dictionary.WordEntity;
+import com.prudprudi4.dictionary.util.Disposition;
 import com.prudprudi4.dictionary.util.TextFormatter;
 import com.prudprudi4.dictionary.util.WordStorage;
 
@@ -63,13 +64,9 @@ public class MainFrame extends JFrame {
         setTitle(TITLE);
         setSize(WIDTH, HEIGHT);
         setResizable(false);
-        getContentPane().add(mainPanel);
-
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        Point p = new Point(d.width / 2 - WIDTH / 2, d.height / 2 - HEIGHT / 2);
-
-        setLocation(p);
+        setLocation(Disposition.getWindowCenterPos(WIDTH, HEIGHT));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().add(mainPanel);
 
         mainPanel.setLayout(new BorderLayout());
 

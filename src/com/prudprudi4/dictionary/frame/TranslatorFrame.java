@@ -55,19 +55,14 @@ class TranslatorFrame extends JDialog {
         fromField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-
-                String text = fromField.getText().trim().intern();
+                String text = fromField.getText().trim().replaceAll("=", "");
                 if (text.isEmpty()) {
                     editorPane.setText("");
                     return;
                 }
 
-                if (text.indexOf('=') != -1) {
-                    return;
-                }
-
-                try {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    try {
                         thread.join();
                         dispose();
                         JList<String> listView = parent.getListView();
@@ -87,9 +82,10 @@ class TranslatorFrame extends JDialog {
                         parent.showWordInfo();
 
                         wEntity = null;
+
+                    } catch (InterruptedException ex) {
+                        ex.printStackTrace();
                     }
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
                 }
             }
         });
@@ -114,6 +110,7 @@ class TranslatorFrame extends JDialog {
         });
         fromField.setDocument(doc);
     }
+
     private void fromFieldHandler(DocumentEvent event) {
         thread = new Thread(new PrintWordInfoRunnable());
         thread.start();
@@ -135,7 +132,7 @@ class TranslatorFrame extends JDialog {
                 editorPane.setText(format);
 
             } catch (IOException e) {
-                e.printStackTrace();
+                new ErrorDialog("Connection problem: " + e.toString());
             }
         }
     }

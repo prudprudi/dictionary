@@ -19,13 +19,19 @@ public class Translator {
     private static String getApiKey() {
         Properties props = new Properties();
         String key = null;
+        String defaultKey = "trnsl.1.1.20170922T205950Z.e8fdcc1a5f095ef8.4985b96369d828b60dd9ece94dba46da2ea61fd9";
 
         try {
-            FileInputStream fis = new FileInputStream("config.properties");
+
+            File file = new File("config.properties");
+
+            if (!file.exists()) return defaultKey;
+
+            FileInputStream fis = new FileInputStream(file);
             props.load(fis);
 
             key = props.getProperty("api_key");
-            key = (key != null) ? key : "trnsl.1.1.20170922T205950Z.e8fdcc1a5f095ef8.4985b96369d828b60dd9ece94dba46da2ea61fd9";
+            key = (key != null) ? key : defaultKey;
 
         } catch (IOException e) {
             e.printStackTrace();

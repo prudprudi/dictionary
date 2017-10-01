@@ -3,6 +3,7 @@ package com.prudprudi4.dictionary.util;
 import com.prudprudi4.dictionary.Dictionary;
 import com.prudprudi4.dictionary.SortedListModel;
 import com.prudprudi4.dictionary.WordEntity;
+import com.prudprudi4.dictionary.frame.ErrorDialog;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -36,7 +37,7 @@ public class WordStorage {
                 words.put(strs[0], wEntity);
             }
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            new ErrorDialog("Can not load words from words storage: " + e.toString());
 
         } finally {
             if (br != null) {
@@ -70,7 +71,7 @@ public class WordStorage {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            new ErrorDialog("Can not save words in words storage: " + e.toString());
 
         } finally {
             if (pw != null) {
